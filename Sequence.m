@@ -1,23 +1,23 @@
-%userpath('D:\ÂÛÎÄ-µÚ¶şµã\Ğ¡Êı¾İ¼¯\´®ĞĞ\BRCA\top100')
+%userpath('D:\è®ºæ–‡-ç¬¬äºŒç‚¹\å°æ•°æ®é›†\ä¸²è¡Œ\BRCA\top100')
 
 tic
-%%%%%%%%%%%%%%%%Êı¾İµ¼Èë%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%æ•°æ®å¯¼å…¥%%%%%%%%%%%%%%%%
 %gene_difforder = importdata('C:\Users\Sunshine\Desktop\test.txt') % Differentially expressed dataset
 gene_difforder =  readtable('GENE_EXP.txt','Delimiter','\t','ReadRowNames',1);
-disp('»ùÒòÊı¾İµ¼ÈëÍê±Ï');
+disp('åŸºå› æ•°æ®å¯¼å…¥å®Œæ¯•');
 gene_difforder(1:5,1:5);
 [numGenes,numSample_Gene]=size(gene_difforder);
 %[numGnes,numSample]=size(gene_difforder.textdata)
 
 %TF_EXP = importdata('TF_EXP.txt')
 TF_EXP = readtable('TF_EXP.txt','Delimiter','\t','ReadRowNames',1);
-disp('×ªÂ¼Òò×ÓÊı¾İµ¼ÈëÍê±Ï');
+disp('è½¬å½•å› å­æ•°æ®å¯¼å…¥å®Œæ¯•');
 TF_EXP(1:5,1:5);
 [numTFs,numSample_TF]=size(TF_EXP);
 
 %miRNA_EXP <- importdata('miRNA_EXP.txt')
 miRNA_EXP = readtable('miRNA_EXP.txt','Delimiter','\t','ReadRowNames',1);
-disp('miRNAÊı¾İµ¼ÈëÍê±Ï');
+disp('miRNAæ•°æ®å¯¼å…¥å®Œæ¯•');
 miRNA_EXP(1:5,1:5);
 [nummiRNAs,numSample_miRNA]=size(miRNA_EXP);
 
@@ -25,7 +25,7 @@ numCase=778;
 numControl=100;
 
 
-case_new_gene = gene_difforder{:,1:numCase} ;  % case group   %{}È¡³öÏàÓ¦µÄÖµ%£¨£©±íÊ¾È¡³öÀ´µÄ»¹ÊÇtableÀàĞÍ
+case_new_gene = gene_difforder{:,1:numCase} ;  % case group   %{}å–å‡ºç›¸åº”çš„å€¼%ï¼ˆï¼‰è¡¨ç¤ºå–å‡ºæ¥çš„è¿˜æ˜¯tableç±»å‹
 ctl_new_gene = gene_difforder{:,numCase+1:numSample_Gene} ; % control group
 case_new_TF = TF_EXP{:,1:numCase};   % case group
 ctl_new_TF = TF_EXP{:,numCase+1:numSample_TF};  % control group
@@ -35,24 +35,24 @@ genes_names = gene_difforder.Properties.RowNames;
 TFs_names = TF_EXP.Properties.RowNames;
 miRNAs_names = miRNA_EXP.Properties.RowNames;
 
-%%%%%%%%%%%%%%%%%%%%¼ÆËãTFÓë»ùÒòµÄÏà¹ØĞÔ%%%%%%%%%%%%%%%%%%%%%%%%%%%%555
-disp('¿ªÊ¼¼ÆËã');
+%%%%%%%%%%%%%%%%%%%%è®¡ç®—TFä¸åŸºå› çš„ç›¸å…³æ€§%%%%%%%%%%%%%%%%%%%%%%%%%%%%555
+disp('å¼€å§‹è®¡ç®—');
 
-disp('¿ªÊ¼¼ÆËã»ùÒò-TFÏà¹ØĞÔ');
+disp('å¼€å§‹è®¡ç®—åŸºå› -TFç›¸å…³æ€§');
 
 s1=corr((case_new_gene)',(case_new_TF)','type', 'Pearson');
 s2=corr((ctl_new_gene)',(ctl_new_TF)','type', 'Pearson');
 s = abs(s1-s2);
 
-str = array2table(s,'VariableNames',TFs_names,'RowNames',genes_names);  %ÕâÀï»¹²»¶Ô
+str = array2table(s,'VariableNames',TFs_names,'RowNames',genes_names);  %è¿™é‡Œè¿˜ä¸å¯¹
 
 writetable(str,'gene-TF_cor.csv','WriteVariableNames',true,'WriteRowNames',true,'Delimiter',',');
-disp('¼ÆËãTF-GENEÍê³É');
+disp('è®¡ç®—TF-GENEå®Œæˆ');
 
 
 
 
-%%%%%%%%%%%%%%%%%%%%È¥µômiRNAºÍ»ùÒò±í´ïÆ×ÖĞ²»Í¬µÄÑù±¾%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%å»æ‰miRNAå’ŒåŸºå› è¡¨è¾¾è°±ä¸­ä¸åŒçš„æ ·æœ¬%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 samName_comm = intersect(gene_difforder.Properties.VariableNames(1:numSample_Gene),miRNA_EXP.Properties.VariableNames(1:numSample_miRNA));
 samName_comm_case = intersect(samName_comm,gene_difforder.Properties.VariableNames(1:numCase));
@@ -66,11 +66,11 @@ case_new_miRNA1= miRNA_EXP{:,miRNA_EXP.Properties.VariableNames(samName_comm_cas
 ctl_new_miRNA1 =miRNA_EXP{:,miRNA_EXP.Properties.VariableNames(samName_comm_ctl)};  % control group
 
 
-disp('Êı¾İ´¦ÀíÍê³É');
+disp('æ•°æ®å¤„ç†å®Œæˆ');
 
-%%%%%%%%%%%%%%%%%%%%¼ÆËãmiRNAÓë»ùÒòµÄÏà¹ØĞÔ%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%è®¡ç®—miRNAä¸åŸºå› çš„ç›¸å…³æ€§%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-disp('¿ªÊ¼¼ÆËãmiRNA-geneÏà¹ØĞÔ') ;   
+disp('å¼€å§‹è®¡ç®—miRNA-geneç›¸å…³æ€§') ;   
 s11=corr((case_new_gene1)',(case_new_miRNA1)','type', 'Pearson');
 s21=corr((ctl_new_gene1)',(ctl_new_miRNA1)','type', 'Pearson');
     
@@ -78,13 +78,13 @@ sw = abs(s11-s21);
 
 t_sw = array2table(sw,'VariableNames',miRNAs_names,'RowNames',genes_names);
 writetable(t_sw,'gene-miRNA_cor.csv','WriteVariableNames',true,'WriteRowNames',true,'Delimiter',',');
-disp('¼ÆËãmiRNA-geneÍê³É');
+disp('è®¡ç®—miRNA-geneå®Œæˆ');
 
 
 
 gene_TF_miRNA = [s,sw];
 
-[Y,new_gene_TF_miRNA] = sort(gene_TF_miRNA,2,'descend'); % DIM=2±íÊ¾¶Ô¾ØÕóµÄ¸÷ĞĞÖĞµÄÔªËØÅÅÁĞ£¬MODEÄ¬ÈÏÉıĞò£¬
+[Y,new_gene_TF_miRNA] = sort(gene_TF_miRNA,2,'descend'); % DIM=2è¡¨ç¤ºå¯¹çŸ©é˜µçš„å„è¡Œä¸­çš„å…ƒç´ æ’åˆ—ï¼ŒMODEé»˜è®¤å‡åºï¼Œ
 csvwrite( 'new_use_gene_TF_miRNA.csv',new_gene_TF_miRNA);  
 
 [nrow,ncol]=size(new_gene_TF_miRNA);
@@ -93,10 +93,10 @@ csvwrite( 'col_sort_L.csv',L);
 
 
 
-%%%%%%%%%%%%% ¼ÆËãÃ¿¸öµ÷¿ØÒò×ÓµÄ¸»¼¯¶È%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%% è®¡ç®—æ¯ä¸ªè°ƒæ§å› å­çš„å¯Œé›†åº¦%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%%%%%%%%%%%´®ĞĞ¼ÆËã·½·¨
+%%%%%%%%%%%ä¸²è¡Œè®¡ç®—æ–¹æ³•
  
 regulators=zeros(ncol,1);
 
@@ -118,12 +118,12 @@ writetable(t_regulators,'regulators_pvalue.csv','WriteVariableNames',true,'Write
 
 
 
-%%%%%%%%%%%%%¸ù¾İp-valueÉıĞòÅÅÁĞ£¬µÃµ½¹Ø¼üµ÷¿ØÒò×Ó%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%æ ¹æ®p-valueå‡åºæ’åˆ—ï¼Œå¾—åˆ°å…³é”®è°ƒæ§å› å­%%%%%%%%%%%%%%%%%%%%%%%%
 res_candite = sort(regulators);
 csvwrite( 'res_candite_totalgenes.csv',res_candite);
 
 toc
-disp(['ÔËĞĞÊ±¼ä: ',num2str(toc)]);
+disp(['è¿è¡Œæ—¶é—´: ',num2str(toc)]);
 csvwrite( 'runtime.csv',num2str(toc));
 
 save data;
