@@ -104,17 +104,21 @@ csvwrite( 'col_sort_L.csv',L);
 
 
 
- 
-regulators=zeros(ncol,1);
-for regulator = 1:ncol
 
- 
+regulators=zeros(ncol,1);
+
+
+for regulator = 1:ncol
+ % disp('calculate i th, i=');
+ % disp(regulator);
+  
   data1 = find(L==regulator);
   data2 = find(L~=regulator);
   
-  [pvalue,H] = ranksum(data1,data2);
+  [pvalue,H] = ranksum(data1,data2); % alpha=0.05
   regulators(regulator) = pvalue;
 end
+
 
 TF_miRNA_names = [TFs_names;miRNAs_names];
 
