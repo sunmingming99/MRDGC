@@ -1,31 +1,35 @@
-%userpath('D:\论文-第二点\小数据集\串行\BRCA\top100')
+% userpath('\Users\venhe\Documents\MATLAB\top1000')
+
 
 tic
-%%%%%%%%%%%%%%%%数据导入%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%import data%%%%%%%%%%%%%%%%
 %gene_difforder = importdata('C:\Users\Sunshine\Desktop\test.txt') % Differentially expressed dataset
 gene_difforder =  readtable('GENE_EXP.txt','Delimiter','\t','ReadRowNames',1);
-disp('基因数据导入完毕');
+disp('gene data import successfully');
 gene_difforder(1:5,1:5);
 [numGenes,numSample_Gene]=size(gene_difforder);
-%[numGnes,numSample]=size(gene_difforder.textdata)
+
 
 %TF_EXP = importdata('TF_EXP.txt')
 TF_EXP = readtable('TF_EXP.txt','Delimiter','\t','ReadRowNames',1);
-disp('转录因子数据导入完毕');
+disp('TF data import successfully');
 TF_EXP(1:5,1:5);
 [numTFs,numSample_TF]=size(TF_EXP);
 
 %miRNA_EXP <- importdata('miRNA_EXP.txt')
 miRNA_EXP = readtable('miRNA_EXP.txt','Delimiter','\t','ReadRowNames',1);
-disp('miRNA数据导入完毕');
+disp('miRNA data import successfully');
 miRNA_EXP(1:5,1:5);
 [nummiRNAs,numSample_miRNA]=size(miRNA_EXP);
 
-numCase=778;
+%%%Set the number of case, control and  theta, TOP K by yourself 
+numCase=778 ;
 numControl=100;
+theta=0.01
+K=100
 
-
-case_new_gene = gene_difforder{:,1:numCase} ;  % case group   %{}取出相应的值%（）表示取出来的还是table类型
+case_new_gene = gene_difforder{:,1:numCase} ;  % case group   
 ctl_new_gene = gene_difforder{:,numCase+1:numSample_Gene} ; % control group
 case_new_TF = TF_EXP{:,1:numCase};   % case group
 ctl_new_TF = TF_EXP{:,numCase+1:numSample_TF};  % control group
@@ -35,42 +39,46 @@ genes_names = gene_difforder.Properties.RowNames;
 TFs_names = TF_EXP.Properties.RowNames;
 miRNAs_names = miRNA_EXP.Properties.RowNames;
 
-%%%%%%%%%%%%%%%%%%%%计算TF与基因的相关性%%%%%%%%%%%%%%%%%%%%%%%%%%%%555
-disp('开始计算');
 
-disp('开始计算基因-TF相关性');
+%%%%%%%%%%%%%%%%%%%%Calculate the relation between TF and gene%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+disp('start calculating');
+disp('start calculating the relation between TF and gene');
 
 s1=corr((case_new_gene)',(case_new_TF)','type', 'Pearson');
 s2=corr((ctl_new_gene)',(ctl_new_TF)','type', 'Pearson');
 s = abs(s1-s2);
 
-str = array2table(s,'VariableNames',TFs_names,'RowNames',genes_names);  %这里还不对
+str = array2table(s,'VariableNames',TFs_names,'RowNames',genes_names) ; 
 
 writetable(str,'gene-TF_cor.csv','WriteVariableNames',true,'WriteRowNames',true,'Delimiter',',');
-disp('计算TF-GENE完成');
+
+disp('calculae the relation between TF and gene successfully');
 
 
 
 
-%%%%%%%%%%%%%%%%%%%%去掉miRNA和基因表达谱中不同的样本%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%remove the different samples in expression profiles between miRNA and genes %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 samName_comm = intersect(gene_difforder.Properties.VariableNames(1:numSample_Gene),miRNA_EXP.Properties.VariableNames(1:numSample_miRNA));
 samName_comm_case = intersect(samName_comm,gene_difforder.Properties.VariableNames(1:numCase));
 samName_comm_ctl = intersect(samName_comm,gene_difforder.Properties.VariableNames(numCase+1:numSample_Gene));
 
 
+case_new_gene1 = gene_difforder{:,gene_difforder.Properties.VariableNames(samName_comm_case)};      % case group
+ctl_new_gene1 = gene_difforder{:,gene_difforder.Properties.VariableNames(samName_comm_ctl)} ;   % control group
+case_new_miRNA1= miRNA_EXP{:,miRNA_EXP.Properties.VariableNames(samName_comm_case)}  ;  % case group
+ctl_new_miRNA1 =miRNA_EXP{:,miRNA_EXP.Properties.VariableNames(samName_comm_ctl)} ; % control group
 
-case_new_gene1 = gene_difforder{:,gene_difforder.Properties.VariableNames(samName_comm_case)};         % case group
-ctl_new_gene1 = gene_difforder{:,gene_difforder.Properties.VariableNames(samName_comm_ctl)};    % control group
-case_new_miRNA1= miRNA_EXP{:,miRNA_EXP.Properties.VariableNames(samName_comm_case)} ;   % case group
-ctl_new_miRNA1 =miRNA_EXP{:,miRNA_EXP.Properties.VariableNames(samName_comm_ctl)};  % control group
+
+disp('data process successfully');
 
 
-disp('数据处理完成');
+%%%%%%%%%%%%%%%%%%%%Calculate the relation between miRNA and gene%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%计算miRNA与基因的相关性%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-disp('开始计算miRNA-gene相关性') ;   
+disp('start calculating the relation between miRNA and gene');
 s11=corr((case_new_gene1)',(case_new_miRNA1)','type', 'Pearson');
 s21=corr((ctl_new_gene1)',(ctl_new_miRNA1)','type', 'Pearson');
     
@@ -78,14 +86,13 @@ sw = abs(s11-s21);
 
 t_sw = array2table(sw,'VariableNames',miRNAs_names,'RowNames',genes_names);
 writetable(t_sw,'gene-miRNA_cor.csv','WriteVariableNames',true,'WriteRowNames',true,'Delimiter',',');
-disp('计算miRNA-gene完成');
-
-
+disp('calculae the relation between miRNA and gene successfully');
 
 gene_TF_miRNA = [s,sw];
 
-[Y,new_gene_TF_miRNA] = sort(gene_TF_miRNA,2,'descend'); % DIM=2表示对矩阵的各行中的元素排列，MODE默认升序，
-csvwrite( 'new_use_gene_TF_miRNA.csv',new_gene_TF_miRNA);  
+
+[Y,new_gene_TF_miRNA] = sort(gene_TF_miRNA,2,'descend');% DIM=2��ʾ�Ծ���ĸ����е�Ԫ�����У�MODEĬ������
+csvwrite( 'new_use_gene_TF_miRNA.csv',new_gene_TF_miRNA) ; 
 
 [nrow,ncol]=size(new_gene_TF_miRNA);
 L=reshape(new_gene_TF_miRNA,nrow*ncol,1);
@@ -93,21 +100,19 @@ csvwrite( 'col_sort_L.csv',L);
 
 
 
-%%%%%%%%%%%%% 计算每个调控因子的富集度%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%% calculate enrichment of each regulator%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%%%%%%%%%%%串行计算方法
+
  
 regulators=zeros(ncol,1);
-
 for regulator = 1:ncol
- % disp('calculate i th, i=');
- % disp(regulator);
-  
+
+ 
   data1 = find(L==regulator);
   data2 = find(L~=regulator);
   
-  [pvalue,H] = ranksum(data1,data2); % alpha=0.05
+  [pvalue,H] = ranksum(data1,data2);
   regulators(regulator) = pvalue;
 end
 
@@ -118,12 +123,19 @@ writetable(t_regulators,'regulators_pvalue.csv','WriteVariableNames',true,'Write
 
 
 
-%%%%%%%%%%%%%根据p-value升序排列，得到关键调控因子%%%%%%%%%%%%%%%%%%%%%%%%
-res_candite = sort(regulators);
-csvwrite( 'res_candite_totalgenes.csv',res_candite);
+%%%%%%%%%%%%%identify the candidate master regulators according to the p-value (ascending)%%%%%%%%%%%%%%%%%%%%%%%%
+res_candite = sortrows(t_regulators,1);
+%csvwrite( 'res_candite_totalgenes.csv',res_candite);
+%res_candite=find(res_candite{:,1}<theta)
+writetable(res_candite(find(res_candite{:,1}<theta),:),'res_candite_totalgenes.csv','WriteVariableNames',true,'WriteRowNames',true,'Delimiter',',');
 
 toc
-disp(['运行时间: ',num2str(toc)]);
+disp(['run time: ',num2str(toc)]);
 csvwrite( 'runtime.csv',num2str(toc));
+
+writetable(res_candite(1:K,:),'master_regultors.csv','WriteVariableNames',true,'WriteRowNames',true,'Delimiter',',');
+
+
+
 
 save data;
