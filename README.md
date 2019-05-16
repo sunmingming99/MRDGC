@@ -1,5 +1,4 @@
-# MRDGC
-MRDGC: a parallel approach for the identification of master regulators based on the differentially expressed genes and the regulatory capacity of regulators
+# MRDGC: a parallel approach for the identification of master regulators based on the differentially expressed genes and the regulatory capacity of regulators
 ====================================================
 
 
